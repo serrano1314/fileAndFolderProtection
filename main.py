@@ -1,8 +1,8 @@
-
 import os,stat
 
 def is_locked(filepath):
     return bool(os.stat(filepath).st_file_attributes & stat.FILE_ATTRIBUTE_SYSTEM)
+
 
 def set_password():
     while(1):
@@ -15,34 +15,62 @@ def set_password():
             print('Password doesn\'t match')
             continue
 
-def lock(filename):
+
+def lock():
+    list_dir()
+    n = int(input('> '))
+    filename = FLIST[n-1]
+    pw = set_password()
     os.system('@echo off')
     os.system(f'attrib +s +h {filename}')
-    create_unlocker(filename)
+    print('Locking Successful')
+    create_unlocker(filename,pw)
 
-def create_unlocker(filename):
-    fname_wo_ext = filename.split('.')[0] + '.bat'
-    with open(fname_wo_ext,'w') as f:
+
+def create_unlocker(filename,pw):
+    batchFile = filename.split('.')[0] + '.bat'
+    with open(batchFile,'w') as f:
         f.write('@echo off\n')
-        f.write(f'attrib -s -h "{filename}"')
+        f.write('setlocal\n')
+        f.write('set /p inputPw=Type Password:\n')
+        f.write(f'set pw={pw}\n')
+        f.write(f'if "%pw%" equ "%inputPw%" ( \n')
+        f.write(f'attrib -s -h {filename}\n')
+        f.write(f'batchDel.bat {batchFile}\n')
+        if '.' in filename:
+            f.write(f'"{filename}"\n')
+        else:
+            f.write(f'explorer.exe "{filename}"\n')
+        f.write('pause\n')
+        f.write(') else ( echo Wrong Password. Program will Exit. ) \n')
+        f.write('endlocal \n')
+        f.write('pause')
 
 
 def list_dir():
-    flist = os.listdir(".")
-    i=0
-    for item in flist:
+    print('Select a file/folder:')
+    i=1
+    for item in FLIST:
+        print(f'[{i}] {item}')
         i+=1
-        print(f'{i} {item}')
     # print('>>', flist[3].split('.')[0] )
     # n = int(input(">> "))
     # test = os.system(f'attrib {flist[n-1]}')
 
 def main():
+    global FLIST
+    FLIST = os.listdir(".")
     print('SELECT ACTION:')
     print('[1] Lock')
     print('[2] Unlock')
     print('[X] Exit')
-    print(set_password())
+    choose = input('> ')
+    if(choose == '1'):
+        lock()
+    elif(choose == '2'):
+        pass
+    else:
+        return
 
 
 if __name__ == "__main__":
