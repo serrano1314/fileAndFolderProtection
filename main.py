@@ -1,9 +1,5 @@
 import os,stat
 
-def is_locked(filepath):
-    return bool(os.stat(filepath).st_file_attributes & stat.FILE_ATTRIBUTE_SYSTEM)
-
-
 def set_password():
     while(1):
         lockPassword = input('Please Enter a Password:')
@@ -17,6 +13,7 @@ def set_password():
 
 
 def lock():
+    print('Select a file/folder to LOCK:')
     list_dir()
     n = int(input('> '))
     if n==0:
@@ -29,6 +26,8 @@ def lock():
     print('Locking Successful')
     create_unlocker(filename,pw)
 
+def unlock():
+    pass
 
 def create_unlocker(filename,pw):
     batchFile = filename.split('.')[0] + '.bat'
@@ -50,8 +49,11 @@ def create_unlocker(filename,pw):
         f.write('pause')
 
 
+def is_locked(filepath):
+    return bool(os.stat(filepath).st_file_attributes & stat.FILE_ATTRIBUTE_SYSTEM)
+
+
 def list_dir():
-    print('Select a file/folder:')
     i=1
     for item in FLIST:
         print(f'\033[0m', end='')
@@ -64,14 +66,18 @@ def list_dir():
 
         i+=1
     print(f'\033[0m')
-    # print('>>', flist[3].split('.')[0] )
-    # n = int(input(">> "))
-    # test = os.system(f'attrib {flist[n-1]}')
 
 def main():
+    # Getting all files and folder in current directory excluding batch files
     global FLIST
     FLIST = os.listdir(".")
-    print('SELECT ACTION:')
+    for item in FLIST:
+        if '.bat' in item:
+            FLIST.remove(item)
+
+    # creating a menu
+    print('\n\033[96mFILE/FOLDER PROTECTION\n\033[0m')
+    print('Select Action:')
     print('[1] Lock')
     print('[2] Unlock')
     print('[X] Exit')
