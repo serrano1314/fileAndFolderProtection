@@ -19,10 +19,13 @@ def set_password():
 def lock():
     list_dir()
     n = int(input('> '))
+    if n==0:
+        return
+
     filename = FLIST[n-1]
     pw = set_password()
     os.system('@echo off')
-    os.system(f'attrib +s +h {filename}')
+    os.system(f'attrib +s +h "{filename}"')
     print('Locking Successful')
     create_unlocker(filename,pw)
 
@@ -35,8 +38,8 @@ def create_unlocker(filename,pw):
         f.write('set /p inputPw=Type Password:\n')
         f.write(f'set pw={pw}\n')
         f.write(f'if "%pw%" equ "%inputPw%" ( \n')
-        f.write(f'attrib -s -h {filename}\n')
-        f.write(f'batchDel.bat {batchFile}\n')
+        f.write(f'attrib -s -h "{filename}"\n')
+        f.write(f'del "{batchFile}"\n')
         if '.' in filename:
             f.write(f'"{filename}"\n')
         else:
@@ -51,8 +54,16 @@ def list_dir():
     print('Select a file/folder:')
     i=1
     for item in FLIST:
-        print(f'[{i}] {item}')
+        print(f'\033[0m', end='')
+        if is_locked(item):
+            print(f'[{i}]', end='')
+            print(f'\033[91m {item} [LOCKED]')
+        else:
+            print(f'[{i}]', end='')
+            print(f'\033[92m {item}')
+
         i+=1
+    print(f'\033[0m')
     # print('>>', flist[3].split('.')[0] )
     # n = int(input(">> "))
     # test = os.system(f'attrib {flist[n-1]}')
