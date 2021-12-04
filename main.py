@@ -1,9 +1,10 @@
 import os,stat
+import pwinput as pwi
 
 def set_password():
     while(1):
-        lockPassword = input('Please Enter a Password:')
-        verifyPassword = input('Type Again Password:')
+        lockPassword = pwi.pwinput(prompt='Please Enter a Password:')
+        verifyPassword = pwi.pwinput(prompt='Type Again Password:')
 
         if lockPassword == verifyPassword:
             return lockPassword
@@ -13,7 +14,7 @@ def set_password():
 
 
 def lock():
-    print('Select a file/folder to LOCK:')
+    print('Select a file/folder to \033[91mLOCK\033[0m:')
     list_dir()
     n = int(input('> '))
     if n==0:
@@ -27,7 +28,14 @@ def lock():
     create_unlocker(filename,pw)
 
 def unlock():
-    pass
+    print('Select a file/folder to \033[92mUNLOCK\033[0m:')
+    list_dir()
+    n = int(input('> '))
+    if n==0:
+        return
+
+    batchFile = FLIST[n-1].split('.')[0] + '.bat'
+    os.system(f'"{batchFile}"')
 
 def create_unlocker(filename,pw):
     batchFile = filename.split('.')[0] + '.bat'
@@ -85,7 +93,7 @@ def main():
     if(choose == '1'):
         lock()
     elif(choose == '2'):
-        pass
+        unlock()
     else:
         return
 
